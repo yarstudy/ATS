@@ -18,9 +18,8 @@ namespace ATS
             random = new Random();
         }
 
-        public Terminal NewTerminal()
+        public Terminal NewTerminal(int number)
         {
-            var number = random.Next(1, 9);
             numbers.Add(number);
             var newPort = new Port(this);
             ports.Add(newPort);
@@ -28,26 +27,34 @@ namespace ATS
             return newTerminal;
         }
 
-        public void Calling(object sender, EventOfCall e)
+        public void Calling(object sender, EventOfCallArgs e)
         {
-            if (numbers.Contains(e.TargetNumber))
+            if (numbers.Contains(e.TargetNumber) && (e.TargetNumber != e.Number))
             {
                 int index = numbers.IndexOf(e.TargetNumber);
                 if (ports[index].State == States.StateOfPort.Connect)
                 {
-                    ports[index].IncomingCall(e.Number);
+                    ports[index].IncomingCall(e.Number, e.TargetNumber);
                 }
+            }
+            else if (!numbers.Contains(e.TargetNumber))
+            {
+                Console.WriteLine("Trying to call a non-existent number".ToUpper());
+            }
+            else
+            {
+                Console.WriteLine("Trying to call your own number".ToUpper());
             }
         }
 
-        public void Answer(object sender, EventofAnswer e)
+        public void Answer(object sender, EventofAnswerArgs e)
         {
             if (numbers.Contains(e.Number))
             {
-                var index = numbers.IndexOf(e.Number);
+                int index = numbers.IndexOf(e.Number);
                 if (ports[index].State == States.StateOfPort.Connect)
                 {
-                    ports[index].AnswerCall(e.Number, e.StateInCall);
+                    ports[index].AnswerCall(e.TargetNumber,e.Number, e.StateOfCall);
                 }
             }
         }

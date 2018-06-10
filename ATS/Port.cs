@@ -13,9 +13,9 @@ namespace ATS
         public StateOfPort State;
         private ATS ats;
         private bool stateOfPort;
-        public delegate void PortEventHandler(object sender, EventOfCall e);
+        public delegate void PortEventHandler(object sender, EventOfCallArgs e);
         public event PortEventHandler IncomingCallEvent;
-        public delegate void PortAnswerEventHandler(object sender, EventofAnswer e);
+        public delegate void PortAnswerEventHandler(object sender, EventofAnswerArgs e);
         public event PortAnswerEventHandler PortAnswerEvent;
 
         public Port(ATS ats)
@@ -54,25 +54,25 @@ namespace ATS
             return false;
         }
 
-        private void SafeIncomingCallEvent(int incomingNumber)
+        private void SafeIncomingCallEvent(int number, int incomingNumber)
         {
             if (IncomingCallEvent != null)
-                IncomingCallEvent(this, new EventOfCall(incomingNumber, 0));
+            IncomingCallEvent(this, new EventOfCallArgs(number, incomingNumber)); 
         }
-        private void SafeAnswerCallEvent(int outgoingNumber, StateOfCall state)
+        private void SafeAnswerCallEvent(int number, int outgoingNumber, StateOfCall state)
         {
             if (PortAnswerEvent != null)
-                PortAnswerEvent(this, new EventofAnswer(outgoingNumber, 0, state));
+                PortAnswerEvent(this, new EventofAnswerArgs(number, outgoingNumber, state));
         }
 
-        public void IncomingCall(int incomingNumber)
+        public void IncomingCall(int number, int incomingNumber)
         {
-            SafeIncomingCallEvent(incomingNumber);
+            SafeIncomingCallEvent(number, incomingNumber);
         }
 
-        public void AnswerCall(int outgoingNumber, StateOfCall state)
+        public void AnswerCall(int number, int outgoingNumber, StateOfCall state)
         {
-            SafeAnswerCallEvent(outgoingNumber, state);
+            SafeAnswerCallEvent(number, outgoingNumber, state);
         }
     }
 }

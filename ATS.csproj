@@ -43,23 +43,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Events\EventofAnswer.cs" />
-    <Compile Include="ATS.cs" />
-    <Compile Include="Events\EventOfCall.cs" />
+    <Compile Include="EventsArgs\EventofAnswerArgs.cs" />
+    <Compile Include="ATS\ATS.cs" />
+    <Compile Include="EventsArgs\EventOfCallArgs.cs" />
     <Compile Include="Contract.cs" />
+    <Compile Include="States\TypeOfTariff.cs" />
     <Compile Include="States\StateOfCall.cs" />
     <Compile Include="States\StateOfPort.cs" />
-    <Compile Include="Port.cs" />
+    <Compile Include="ATS\Port.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Terminal.cs" />
+    <Compile Include="Tariff.cs" />
+    <Compile Include="ATS\Terminal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ATS\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
