@@ -10,6 +10,12 @@ namespace ATS
     {
         static void Main(string[] args)
         {
+            ATS ats = new ATS();
+            Terminal t1 = ats.NewTerminal();
+            Terminal t2 = ats.NewTerminal();
+            t1.ConnectToPort();
+            t2.ConnectToPort();
+            t1.Call(t2.Number);
         }
     }
 }
