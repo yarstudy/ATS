@@ -43,18 +43,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutomaticTelephoneSystem\CallInfo.cs" />
     <Compile Include="EventsArgs\EventofAnswerArgs.cs" />
-    <Compile Include="ATS\ATS.cs" />
+    <Compile Include="AutomaticTelephoneSystem\ATS.cs" />
     <Compile Include="EventsArgs\EventOfCallArgs.cs" />
-    <Compile Include="Contract.cs" />
+    <Compile Include="BillingSystem\Contract.cs" />
+    <Compile Include="EventsArgs\IEventArgs.cs" />
     <Compile Include="States\TypeOfTariff.cs" />
     <Compile Include="States\StateOfCall.cs" />
     <Compile Include="States\StateOfPort.cs" />
-    <Compile Include="ATS\Port.cs" />
+    <Compile Include="AutomaticTelephoneSystem\Port.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tariff.cs" />
-    <Compile Include="ATS\Terminal.cs" />
+    <Compile Include="BillingSystem\Subscriber.cs" />
+    <Compile Include="BillingSystem\Tariff.cs" />
+    <Compile Include="AutomaticTelephoneSystem\Terminal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ATS.States;
+using ATS_Task3.States;
 
-namespace ATS
+namespace ATS_Task3.AutomaticTelephoneSystem
 {
     public class Terminal
     {
@@ -44,7 +44,11 @@ namespace ATS
 
         public void ConnectToATS()
         {
-            TerminalPort.Connect(this);
+            if (TerminalPort.Connect(this))
+            {
+                TerminalPort.IncomingCallEvent += TakeIncomingCall;
+                TerminalPort.PortAnswerEvent += TakeAnswer;
+            }
         }
 
         public void AnswerToCall(int incomingNumber, StateOfCall state)

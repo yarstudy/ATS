@@ -3,17 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ATS_Task3.EventsArgs;
 
-namespace ATS
+namespace ATS_Task3
 {
-    public class EventOfCallArgs : EventArgs
+    public class EventOfCallArgs : EventArgs, IEventArgs
     {
         public int TargetNumber { get; private set; }
         public int Number { get; private set; }
+        public Guid Id { get; private set; }
         public EventOfCallArgs(int number, int target)
         {
             Number = number;
             TargetNumber = target;
+        }
+        public EventOfCallArgs(int number, int target, Guid id)
+        {
+            Number = number;
+            TargetNumber = target;
+            Id = id;
         }
     }
 }

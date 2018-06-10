@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATS.States
+namespace ATS_Task3.States
 {
     public enum StateOfPort
     {
