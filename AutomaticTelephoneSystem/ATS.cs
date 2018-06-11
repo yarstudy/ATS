@@ -9,68 +9,87 @@ using ATS_Task3.EventsArgs;
 
 namespace ATS_Task3.AutomaticTelephoneSystem
 {
-    public class ATS
+    public class ATS : IATS
     {
-        Random random;
         private IList<CallInfo> Calls { get; set; }
-        private IDictionary<int, Tuple<Port, Contract>> Subscribers { get; set; }
+        private IDictionary<int, Tuple<Port, IContract>> Subscribers { get; set; }
 
         public ATS()
         {
-            Calls = new List<CallInfo>();
-            Subscribers = new Dictionary<int, Tuple<Port, Contract>>();
-            random = new Random();
+        Calls = new List<CallInfo>();
+        Subscribers = new Dictionary<int, Tuple<Port, IContract>>();
         }
 
-        public Terminal NewTerminal(Contract contract)
+        public Terminal NewTerminal(IContract contract)
         {
             var newPort = new Port();
             newPort.AnswerEvent += Calling;
             newPort.CallEvent += Calling;
-            Subscribers.Add(contract.Number, new Tuple<Port, Contract>(newPort, contract));
+            newPort.EndCallEvent += Calling; 
+            Subscribers.Add(contract.Number, new Tuple<Port, IContract>(newPort, contract));
             var newTerminal = new Terminal(contract.Number, newPort);
             return newTerminal;
         }
 
-        public Contract SignContract(Subscriber subscriber, TypeOfTariff type)
+        public IContract SignContract(Subscriber subscriber, TypeOfTariff typeOfTariff)
         {
-            Contract contract = new Contract(subscriber, type);
+            Contract contract = new Contract(subscriber, typeOfTariff);
             return contract;
         }
 
-        public void Calling(object sender, IEventArgs e)
+        public void Calling(object sender, ICallEventArgs e)
         {
-            if (Subscribers.ContainsKey(e.TargetNumber) && e.TargetNumber != e.Number)
+            if ((Subscribers.ContainsKey(e.TargetNumber) && e.TargetNumber != e.Number) || e is EventOfEndCallArgs)
             {
-                var targetPort = Subscribers[(e.TargetNumber)].Item1;
-                var port = Subscribers[(e.Number)].Item1;
-                if (targetPort.State == StateOfPort.Connect && port.State == StateOfPort.Connect)
+                CallInfo callInfo = null;
+                Port targetPort;
+                Port port;
+                int number = 0;
+                int targetNumber = 0;
+                if (e is EventOfEndCallArgs)
                 {
-                    var tuple = Subscribers[(e.Number)];
-                    var targetTuple = Subscribers[(e.TargetNumber)];
+                    var callListFirst = Calls.First(x => x.Id.Equals(e.Id));
+                    
+                    if (callListFirst.Number == e.Number)
+                    {
+                        targetPort = Subscribers[callListFirst.TargetNumber].Item1;
+                        port = Subscribers[callListFirst.Number].Item1;
+                        number = callListFirst.Number;
+                        targetNumber = callListFirst.TargetNumber;
+                    }
+                    else
+                    {
+                        port = Subscribers[callListFirst.TargetNumber].Item1;
+                        targetPort = Subscribers[callListFirst.Number].Item1;
+                        targetNumber = callListFirst.Number;
+                        number = callListFirst.TargetNumber;
+                    }
+                }
+                else
+                {
+                    targetPort = Subscribers[e.TargetNumber].Item1;
+                    port = Subscribers[e.Number].Item1;
+                    targetNumber = e.TargetNumber;
+                    number = e.Number;
+                }
+                if (targetPort.State == States.StateOfPort.Connect && port.State == StateOfPort.Connect)
+                {
+                    var tuple = Subscribers[number];
+                    var targetTuple = Subscribers[targetNumber];
 
-                    if (e is EventofAnswerArgs)
+                    if (e is EventOfAnswerArgs)
                     {
 
-                        var answerArgs = (EventofAnswerArgs)e;
-                        CallInfo inf = null;
-                        if (answerArgs.Id == null)
+                        var answerArgs = (EventOfAnswerArgs)e;
+
+                        if (!answerArgs.Id.Equals(Guid.Empty) && Calls.Any(x => x.Id.Equals(answerArgs.Id)))
                         {
-                            inf = new CallInfo();
-                            Calls.Add(inf);
+                            callInfo = Calls.First(x => x.Id.Equals(answerArgs.Id));
                         }
 
-                        if (answerArgs.Id != null && Calls.Any(x => x.Id == answerArgs.Id))
+                        if (callInfo != null)
                         {
-                            inf = Calls.First(x => x.Id == answerArgs.Id);
-                        }
-                        if (answerArgs.StateOfCall == StateOfCall.Answer)
-                        {
-                            targetTuple.Item2.Subscriber.WithdrawMoney(tuple.Item2.Tariff.PricePerMinute);
-                        }
-                        if (inf != null)
-                        {
-                            targetPort.AnswerCall(answerArgs.Number, answerArgs.TargetNumber, answerArgs.StateOfCall, inf.Id);
+                            targetPort.AnswerCall(answerArgs.Number, answerArgs.TargetNumber, answerArgs.StateOfCall, callInfo.Id);
                         }
                         else
                         {
@@ -82,20 +101,23 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                         if (tuple.Item2.Subscriber.Account > tuple.Item2.Tariff.PricePerMinute)
                         {
                             var callArgs = (EventOfCallArgs)e;
-                            CallInfo inf = null;
-                            if (callArgs.Id == null)
+
+                            if (callArgs.Id.Equals(Guid.Empty))
                             {
-                                inf = new CallInfo();
-                                Calls.Add(inf);
+                                callInfo = new CallInfo(
+                                    callArgs.Number,
+                                    callArgs.TargetNumber,
+                                    DateTime.Now);
+                                Calls.Add(callInfo);
                             }
 
-                            if (callArgs.Id != null && Calls.Any(x => x.Id == callArgs.Id))
+                            if (!callArgs.Id.Equals(Guid.Empty) && Calls.Any(x => x.Id.Equals(callArgs.Id)))
                             {
-                                inf = Calls.First(x => x.Id == callArgs.Id);
+                                callInfo = Calls.First(x => x.Id.Equals(callArgs.Id));
                             }
-                            if (inf != null)
+                            if (callInfo != null)
                             {
-                                targetPort.IncomingCall(callArgs.Number, callArgs.TargetNumber, inf.Id);
+                                targetPort.IncomingCall(callArgs.Number, callArgs.TargetNumber, callInfo.Id);
                             }
                             else
                             {
@@ -105,9 +127,21 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                         else
                         {
                             Console.WriteLine("There is not enough money on the terminal {0}!", e.Number);
+
                         }
                     }
+                    if (e is EventOfEndCallArgs)
+                    {
+                        var args = (EventOfEndCallArgs)e;
+                        callInfo = Calls.First(x => x.Id.Equals(args.Id));
+                        callInfo.EndOfCall = DateTime.Now;
+                        var sumOfCall = tuple.Item2.Tariff.PricePerMinute * TimeSpan.FromTicks((callInfo.EndOfCall - callInfo.StartOfCall).Ticks).TotalMinutes;
+                        callInfo.CostOfCall = (int)sumOfCall;
+                        targetTuple.Item2.Subscriber.WithdrawMoney(callInfo.CostOfCall);
+                        targetPort.AnswerCall(args.Number, args.TargetNumber, StateOfCall.Reject, callInfo.Id);
+                    }
                 }
+
             }
             else if (!Subscribers.ContainsKey(e.TargetNumber))
             {
@@ -117,6 +151,10 @@ namespace ATS_Task3.AutomaticTelephoneSystem
             {
                 Console.WriteLine("Trying to call your own number".ToUpper());
             }
+        }
+        public IList<CallInfo> GetInformationList()
+        {
+            return Calls;
         }
     }
 }

@@ -8,7 +8,7 @@ using ATS_Task3.AutomaticTelephoneSystem;
 
 namespace ATS_Task3.BillingSystem
 {
-    public class Contract
+    public class Contract : IContract
     {
         public Subscriber Subscriber { get; private set; }
         public int Number { get; private set; }

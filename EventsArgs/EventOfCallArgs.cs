@@ -7,7 +7,7 @@ using ATS_Task3.EventsArgs;
 
 namespace ATS_Task3
 {
-    public class EventOfCallArgs : EventArgs, IEventArgs
+    public class EventOfCallArgs : EventArgs, ICallEventArgs
     {
         public int TargetNumber { get; private set; }
         public int Number { get; private set; }

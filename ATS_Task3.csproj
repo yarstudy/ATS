@@ -44,13 +44,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutomaticTelephoneSystem\CallInfo.cs" />
+    <Compile Include="AutomaticTelephoneSystem\IATS.cs" />
+    <Compile Include="BillingSystem\BillSyst.cs" />
+    <Compile Include="BillingSystem\IBillSyst.cs" />
+    <Compile Include="BillingSystem\IContract.cs" />
+    <Compile Include="BillingSystem\IMemory.cs" />
+    <Compile Include="BillingSystem\IReportCompiler.cs" />
     <Compile Include="BillingSystem\RecordOfReport.cs" />
     <Compile Include="BillingSystem\Report.cs" />
     <Compile Include="BillingSystem\ReportCompiler.cs" />
-    <Compile Include="EventsArgs\EventofAnswerArgs.cs" />
+    <Compile Include="EventsArgs\EventOfAnswerArgs.cs" />
     <Compile Include="AutomaticTelephoneSystem\ATS.cs" />
     <Compile Include="EventsArgs\EventOfCallArgs.cs" />
     <Compile Include="BillingSystem\Contract.cs" />
+    <Compile Include="EventsArgs\EventOfEndCallArgs.cs" />
     <Compile Include="EventsArgs\IEventArgs.cs" />
     <Compile Include="States\TypeOfCall.cs" />
     <Compile Include="States\TypeOfSort.cs" />

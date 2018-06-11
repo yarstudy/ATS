@@ -7,7 +7,7 @@ using ATS_Task3.States;
 
 namespace ATS_Task3.BillingSystem
 {
-    public class ReportCompiler
+    public class ReportCompiler : IReportCompiler
     {
         public ReportCompiler()
         {

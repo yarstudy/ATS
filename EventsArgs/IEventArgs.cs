@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ATS_Task3.EventsArgs
 {
-    public interface IEventArgs
+    public interface ICallEventArgs
     {
         int Number { get; }
         int TargetNumber { get; }

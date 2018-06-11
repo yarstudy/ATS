@@ -4,22 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ATS_Task3.States;
+using ATS_Task3.EventsArgs;
 
 namespace ATS_Task3.AutomaticTelephoneSystem
 {
 
     public class Port
     {
-        public StateOfPort State { get; private set; }
+        public StateOfPort State { get; set; }
         private bool stateOfPort;
-        public delegate void PortEventHandler(object sender, EventOfCallArgs e);
-        public event PortEventHandler IncomingCallEvent;
-        public delegate void PortAnswerEventHandler(object sender, EventofAnswerArgs e);
-        public event PortAnswerEventHandler PortAnswerEvent;
-        public delegate void CallEventHandler(object sender, EventOfCallArgs e);
-        public event CallEventHandler CallEvent;
-        public delegate void AnswerEventHandler(object sender, EventofAnswerArgs e);
-        public event AnswerEventHandler AnswerEvent;
+
+        //public delegate void PortEventHandler(object sender, EventOfCallArgs e);
+        //public event PortEventHandler PortCallEvent;
+        //public delegate void PortAnswerEventHandler(object sender, EventOfAnswerArgs e);
+        //public event PortAnswerEventHandler PortAnswerEvent;
+        //public delegate void CallEventHandler(object sender, EventOfCallArgs e);
+        //public event CallEventHandler CallEvent;
+        //public delegate void AnswerEventHandler(object sender, EventOfAnswerArgs e);
+        //public event AnswerEventHandler AnswerEvent;
+        //public delegate void EndOfCallEventHandler(object sender, EventOfEndCallArgs e);
+        //public event EndOfCallEventHandler EndCallEvent;
+        public event EventHandler<EventOfCallArgs> PortCallEvent;
+        public event EventHandler<EventOfAnswerArgs> PortAnswerEvent;
+        public event EventHandler<EventOfCallArgs> CallEvent;
+        public event EventHandler<EventOfAnswerArgs> AnswerEvent;
+        public event EventHandler<EventOfEndCallArgs> EndCallEvent;
 
         public Port()
         {
@@ -31,8 +40,9 @@ namespace ATS_Task3.AutomaticTelephoneSystem
             if (State == StateOfPort.Disconnect)
             {
                 State = StateOfPort.Connect;
-                terminal.CallEvent += CallingTo;
-                terminal.AnswerEvent += AnswerTo;
+                terminal.EventOfCall += CallingTo;
+                terminal.EventOfAnswer += AnswerTo;
+                terminal.EventOfEndCall += EndCall;
                 stateOfPort = true;
             }
             return stateOfPort;
@@ -43,12 +53,55 @@ namespace ATS_Task3.AutomaticTelephoneSystem
             if (State == StateOfPort.Connect)
             {
                 State = StateOfPort.Disconnect;
-                terminal.CallEvent -= CallingTo;
-                terminal.AnswerEvent -= AnswerTo;
+                terminal.EventOfCall -= CallingTo;
+                terminal.EventOfAnswer -= AnswerTo;
+                terminal.EventOfEndCall -= EndCall;
                 stateOfPort = false;
             }
             return false;
         }
+
+
+        private void SafeIncomingCallEvent(int number, int target)
+        {
+            if (PortCallEvent != null)
+                PortCallEvent(this, new EventOfCallArgs(number, target));
+        }
+        private void SafeIncomingCallEvent(int number, int target, Guid id)
+        {
+            if (PortCallEvent != null)
+                PortCallEvent(this, new EventOfCallArgs(number, target));
+        }
+        public void IncomingCall(int number, int target)
+        {
+            SafeIncomingCallEvent(number, target);
+        }
+        public void IncomingCall(int number, int target, Guid id)
+        {
+            SafeIncomingCallEvent(number, target, id);
+        }
+
+
+        private void SafeAnswerCallEvent(int number, int target, StateOfCall state)
+        {
+            if (PortAnswerEvent != null)
+                PortAnswerEvent(this, new EventOfAnswerArgs(number, target, state));
+        }
+        private void SafeAnswerCallEvent(int number, int target, StateOfCall state, Guid id)
+        {
+            if (PortAnswerEvent != null)
+                PortAnswerEvent(this, new EventOfAnswerArgs(number, target, state));
+        }
+        public void AnswerCall(int number, int target, StateOfCall state)
+        {
+            SafeAnswerCallEvent(number, target, state);
+        }
+        public void AnswerCall(int number, int target, StateOfCall state, Guid id)
+        {
+            SafeAnswerCallEvent(number, target, state, id);
+        }
+
+
         protected virtual void SafeCallingToEvent(int number, int targetNumber)
         {
             if (CallEvent != null)
@@ -56,63 +109,35 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 CallEvent(this, new EventOfCallArgs(number, targetNumber));
             }
         }
-        protected virtual void SafeAnswerToEvent(int number, int targetNumber, StateOfCall state)
-        {
-            if (AnswerEvent != null)
-            {
-                AnswerEvent(this, new EventofAnswerArgs(number, targetNumber, state));
-            }
-        }
-
-
         private void CallingTo(object sender, EventOfCallArgs e)
         {
             SafeCallingToEvent(e.Number, e.TargetNumber);
         }
-        private void AnswerTo(object sender, EventofAnswerArgs e)
+
+
+        protected virtual void SafeAnswerToEvent(EventOfAnswerArgs eventArgs)
         {
-            SafeAnswerToEvent(e.Number, e.TargetNumber, e.StateOfCall);
+            if (AnswerEvent != null)
+            {
+                AnswerEvent(this, new EventOfAnswerArgs(eventArgs.Number, eventArgs.TargetNumber, eventArgs.StateOfCall, eventArgs.Id));
+            }
+        }
+        private void AnswerTo(object sender, EventOfAnswerArgs e)
+        {
+            SafeAnswerToEvent(e);
         }
 
 
-        private void SafeIncomingCallEvent(int number, int incomingNumber)
+        protected virtual void SafeEndCallEvent(Guid id, int number)
         {
-            if (IncomingCallEvent != null)
-                IncomingCallEvent(this, new EventOfCallArgs(number, incomingNumber));
+            if (EndCallEvent != null)
+            {
+                EndCallEvent(this, new EventOfEndCallArgs(id, number));
+            }
         }
-        private void SafeIncomingCallEvent(int number, int incomingNumber, Guid id)
+        private void EndCall(object sender, EventOfEndCallArgs e)
         {
-            if (IncomingCallEvent != null)
-                IncomingCallEvent(this, new EventOfCallArgs(number, incomingNumber));
-        }
-        public void IncomingCall(int number, int incomingNumber)
-        {
-            SafeIncomingCallEvent(number, incomingNumber);
-        }
-        public void IncomingCall(int number, int incomingNumber, Guid id)
-        {
-            SafeIncomingCallEvent(number, incomingNumber, id);
-        }
-
-
-
-        private void SafeAnswerCallEvent(int number, int outgoingNumber, StateOfCall state)
-        {
-            if (PortAnswerEvent != null)
-                PortAnswerEvent(this, new EventofAnswerArgs(number, outgoingNumber, state));
-        }
-        private void SafeAnswerCallEvent(int number, int outgoingNumber, StateOfCall state, Guid id)
-        {
-            if (PortAnswerEvent != null)
-                PortAnswerEvent(this, new EventofAnswerArgs(number, outgoingNumber, state));
-        }
-        public void AnswerCall(int number, int outgoingNumber, StateOfCall state)
-        {
-            SafeAnswerCallEvent(number, outgoingNumber, state);
-        }
-        public void AnswerCall(int number, int targetNumber, StateOfCall state, Guid id)
-        {
-            SafeAnswerCallEvent(number, targetNumber, state, id);
+            SafeEndCallEvent(e.Id, e.Number);
         }
     }
 }
