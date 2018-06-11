@@ -10,7 +10,7 @@ namespace ATS_Task3.BillingSystem
     public class Tariff
     {
         public int SubscriptionFee { get; private set; }
-        public int PricePerCall { get; private set; }
+        public int PricePerMinute { get; private set; }
         public int LimitСallsPerMonth { get; private set; }
         public TypeOfTariff TariffType { get; private set; }
         public Tariff(TypeOfTariff type)
@@ -21,21 +21,21 @@ namespace ATS_Task3.BillingSystem
                 case TypeOfTariff.Mini:
                     {
                         SubscriptionFee = 10;
-                        PricePerCall = 1;
+                        PricePerMinute = 1;
                         LimitСallsPerMonth = 3;
                         break;
                     }
                 case TypeOfTariff.Maxi:
                     {
                         SubscriptionFee = 20;
-                        PricePerCall = 2;
+                        PricePerMinute = 2;
                         LimitСallsPerMonth = 8;
                         break;
                     }
                 default:
                     {
                         SubscriptionFee = 0;
-                        PricePerCall = 0;
+                        PricePerMinute = 0;
                         LimitСallsPerMonth = 0;
                         break;
                     }

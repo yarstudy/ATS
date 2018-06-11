@@ -29,10 +29,14 @@ namespace ATS_Task3.BillingSystem
             {
                 TariffEffectiveDate = DateTime.Now;
                 Tariff = new Tariff(typeOfTariff);
+                Console.WriteLine("Tariff has been changed".ToUpper());
                 return true;
             }
-            return false;
+            else
+            {
+                Console.WriteLine("To change the tariff, wait until the end of the month".ToUpper());
+                return false;
+            }
         }
-
     }
 }

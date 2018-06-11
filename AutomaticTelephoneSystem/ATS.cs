@@ -66,7 +66,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                         }
                         if (answerArgs.StateOfCall == StateOfCall.Answer)
                         {
-                            targetTuple.Item2.Subscriber.WithdrawMoney(tuple.Item2.Tariff.PricePerCall);
+                            targetTuple.Item2.Subscriber.WithdrawMoney(tuple.Item2.Tariff.PricePerMinute);
                         }
                         if (inf != null)
                         {
@@ -79,7 +79,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                     }
                     if (e is EventOfCallArgs)
                     {
-                        if (tuple.Item2.Subscriber.Account > tuple.Item2.Tariff.PricePerCall)
+                        if (tuple.Item2.Subscriber.Account > tuple.Item2.Tariff.PricePerMinute)
                         {
                             var callArgs = (EventOfCallArgs)e;
                             CallInfo inf = null;

@@ -11,17 +11,16 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         public Guid Id { get; set; }
         public int Number { get; set; }
         public int TargetNumber { get; set; }
-        public DateTime Date { get; set; }
-        public int Cost { get; set; }
+        public DateTime StartOfCall { get; set; }
+        public DateTime EndOfCall { get; set; }
+        public int CostOfCall { get; set; }
 
-        public CallInfo()
+        public CallInfo(int number, int targetNumber, DateTime startOfCall)
         {
             Id = Guid.NewGuid();
-        }
-
-        public CallInfo(Guid id)
-        {
-            Id = id;
+            Number = number;
+            TargetNumber = targetNumber;
+            StartOfCall = startOfCall;
         }
     }
 }
