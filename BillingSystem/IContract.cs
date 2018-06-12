@@ -12,6 +12,6 @@ namespace ATS_Task3.BillingSystem
         Subscriber Subscriber { get; }
         int Number { get; }
         Tariff Tariff { get; }
-        bool ChangeTariff(TypeOfTariff tariffType);
+        void ChangeTariff(TypeOfTariff tariffType);
     }
 }

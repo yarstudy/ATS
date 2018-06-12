@@ -11,14 +11,14 @@ namespace ATS_Task3.BillingSystem
 {
     public class BillSyst : IBillSyst
     {
-        private IMemory<CallInfo> _memory;
+        public IMemory<CallInfo> Memory { get; private set; }
         public BillSyst(IMemory<CallInfo> memory)
         {
-            _memory = memory;
+            Memory = memory;
         }
         public Report GetReport(int telephoneNumber)
         {
-            var calls = _memory.GetInformationList().
+            var calls = Memory.GetInformationList().
                 Where(x => x.Number == telephoneNumber || x.TargetNumber == telephoneNumber).ToList();
             var report = new Report();
             foreach (var call in calls)
@@ -35,7 +35,8 @@ namespace ATS_Task3.BillingSystem
                     callType = TypeOfCall.IncomingCall;
                     number = call.Number;
                 }
-                var record = new RecordOfReport(callType, number, call.StartOfCall, new DateTime((call.EndOfCall - call.StartOfCall).Ticks), call.CostOfCall); // TimeSpan.FromTicks((call.EndCall - call.BeginCall).Ticks) .TotalMinutes  
+                var record = new RecordOfReport(callType, number, call.StartOfCall, new DateTime((call.EndOfCall - call.StartOfCall).Ticks), call.CostOfCall); 
+                // TimeSpan.FromTicks((call.EndCall - call.BeginCall).Ticks) .TotalMinutes  
                 report.AddRecordOfReport(record);
             }
             return report;

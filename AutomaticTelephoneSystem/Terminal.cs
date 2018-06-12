@@ -29,50 +29,35 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 TerminalPort.PortAnswerEvent += TakeAnswer;
             }
         }
-        public void DisConnectToATS()
+        public void DisConnectFromATS()
         {
-            if (TerminalPort.Connect(this))
+            if (!TerminalPort.Connect(this))
             {
                 TerminalPort.PortCallEvent -= TakeIncomingCall;
                 TerminalPort.PortAnswerEvent -= TakeAnswer;
             }
         }
-
-
-        protected virtual void SafeEventOfCall(int targetNumber)
-        {
-            if (EventOfCall != null)
-                EventOfCall(this, new EventOfCallArgs(Number, targetNumber));
-        }
         public void Call(int targetNumber)
         {
-            SafeEventOfCall(targetNumber);
+            if (EventOfCall != null)
+            {
+                EventOfCall(this, new EventOfCallArgs(Number, targetNumber, Id));
+            }
         }
-
-
-        protected virtual void SafeEventOfAnswer(int targetNumber, StateOfCall state, Guid id)
+        public void AnswerToCall(int target, StateOfCall state, Guid id)
         {
             if (EventOfAnswer != null)
             {
-                EventOfAnswer(this, new EventOfAnswerArgs(Number, targetNumber, state, id));
+                EventOfAnswer(this, new EventOfAnswerArgs(Number, target, state, id));
             }
-        }
-        public void Answer(int target, StateOfCall state, Guid id)
-        {
-            SafeEventOfAnswer(target, state, id);
-        }
-
-
-        protected virtual void SafeEventOfEndCall(Guid id)
-        {
-            if (EventOfEndCall != null)
-                EventOfEndCall(this, new EventOfEndCallArgs(id, Number));
         }
         public void EndCall()
         {
-            SafeEventOfEndCall(Id);
+            if (EventOfEndCall != null)
+            {
+                EventOfEndCall(this, new EventOfEndCallArgs(Id, Number));
+            }
         }
-
 
         public void TakeIncomingCall(object sender, EventOfCallArgs e)
         {
@@ -113,10 +98,6 @@ namespace ATS_Task3.AutomaticTelephoneSystem
             {
                 Console.WriteLine("Terminal with number: {0}, have rejected call", e.Number);
             }
-        }
-        public void AnswerToCall(int target, StateOfCall state, Guid id)
-        {
-            SafeEventOfAnswer(target, state, id);
         }
     }
 }

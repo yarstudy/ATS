@@ -41,8 +41,8 @@ namespace ATS_Task3
             Thread.Sleep(3333);
             t1.EndCall();
 
-            Console.WriteLine("/nLog:/n");
-            foreach (var item in compiler.SortCalls(bs.GetReport(t1.Number), States.TypeOfSort.SortByTypeOfCall))
+            Console.WriteLine("\nLog:\n");
+            foreach (var item in compiler.SortCalls(bs.GetReport(t1.Number), TypeOfSort.SortByTypeOfCall))
             {
                 Console.WriteLine("Calls:\n Type {0} |\n Date of Call: {1} |\n Duration: {2} | Cost of Call: {3} | Telephone number: {4}",
                     item.TypeOfCall, item.Date, item.Time.ToString("mm:ss"), item.Amount, item.Number);

@@ -23,19 +23,17 @@ namespace ATS_Task3.BillingSystem
             Number = rnd.Next(1000,9999);
             Tariff = new Tariff(typeOfTariff);
          }
-        public bool ChangeTariff(TypeOfTariff typeOfTariff)
+        public void ChangeTariff(TypeOfTariff typeOfTariff)
         {
             if (DateTime.Now.AddMonths(-1) >= TariffEffectiveDate)
             {
                 TariffEffectiveDate = DateTime.Now;
                 Tariff = new Tariff(typeOfTariff);
                 Console.WriteLine("Tariff has been changed".ToUpper());
-                return true;
             }
             else
             {
                 Console.WriteLine("To change the tariff, wait until the end of the month".ToUpper());
-                return false;
             }
         }
     }

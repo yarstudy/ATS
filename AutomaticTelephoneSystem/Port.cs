@@ -58,92 +58,44 @@ namespace ATS_Task3.AutomaticTelephoneSystem
             }
             return false;
         }
-
-        protected virtual void SafeIncomingCallEvent(int number, int targetNumber)
-        {
-            if (PortCallEvent != null)
-            {
-                PortCallEvent(this, new EventOfCallArgs(number, targetNumber));
-            }
-        }
-        protected virtual void SafeIncomingCallEvent(int number, int targetNumber, Guid id)
+        public void IncomingCall(int number, int targetNumber, Guid id)
         {
             if (PortCallEvent != null)
             {
                 PortCallEvent(this, new EventOfCallArgs(number, targetNumber, id));
             }
         }
-        public void IncomingCall(int number, int targetNumber)
-        {
-            SafeIncomingCallEvent(number, targetNumber);
-        }
-        public void IncomingCall(int number, int targetNumber, Guid id)
-        {
-            SafeIncomingCallEvent(number, targetNumber, id);
-        }
-
-
-        protected virtual void SafeAnswerCallEvent(int number, int targetNumber, StateOfCall state)
-        {
-            if (PortAnswerEvent != null)
-            {
-                PortAnswerEvent(this, new EventOfAnswerArgs(number, targetNumber, state));
-            }
-        }
-        protected virtual void SafeAnswerCallEvent(int number, int targetNumber, StateOfCall state, Guid id)
+        public void AnswerCall(int number, int targetNumber, StateOfCall state, Guid id)
         {
             if (PortAnswerEvent != null)
             {
                 PortAnswerEvent(this, new EventOfAnswerArgs(number, targetNumber, state, id));
             }
         }
-        public void AnswerCall(int number, int targetNumber, StateOfCall state)
-        {
-            SafeAnswerCallEvent(number, targetNumber, state);
-        }
-        public void AnswerCall(int number, int targetNumber, StateOfCall state, Guid id)
-        {
-            SafeAnswerCallEvent(number, targetNumber, state, id);
-        }
-
-
-        protected virtual void SafeCallingToEvent(int number, int targetNumber)
+        private void CallingTo(object sender, EventOfCallArgs e)
         {
             if (CallEvent != null)
             {
-                CallEvent(this, new EventOfCallArgs(number, targetNumber));
+                CallEvent(this, new EventOfCallArgs(e.Number, e.TargetNumber, e.Id));
             }
         }
-        protected virtual void SafeCallingToEvent(EventOfAnswerArgs eventArgs)
+        private void AnswerTo(object sender, EventOfAnswerArgs e)
         {
             if (AnswerEvent != null)
             {
                 AnswerEvent(this, new EventOfAnswerArgs(
-                    eventArgs.Number,
-                    eventArgs.TargetNumber,
-                    eventArgs.StateOfCall,
-                    eventArgs.Id));
-            }
-        }
-        private void CallingTo(object sender, EventOfCallArgs e)
-        {
-            SafeCallingToEvent(e.Number, e.TargetNumber);
-        }
-        private void AnswerTo(object sender, EventOfAnswerArgs e)
-        {
-            SafeCallingToEvent(e);
-        }
-
-        protected virtual void SafeEndCallEvent(Guid id, int number)
-        {
-            if (EndCallEvent != null)
-            {
-                EndCallEvent(this, new EventOfEndCallArgs(id, number));
+                    e.Number,
+                    e.TargetNumber,
+                    e.StateOfCall,
+                    e.Id));
             }
         }
         private void EndCall(object sender, EventOfEndCallArgs e)
         {
-            SafeEndCallEvent(e.Id, e.Number);
+            if (EndCallEvent != null)
+            {
+                EndCallEvent(this, new EventOfEndCallArgs(e.Id, e.Number));
+            }
         }
     }
 }

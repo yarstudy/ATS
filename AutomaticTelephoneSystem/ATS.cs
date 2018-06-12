@@ -39,8 +39,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 
         public void Calling(object sender, ICallEventArgs e)
         {
-            if ((Subscribers.ContainsKey(e.TargetNumber) && e.TargetNumber != e.Number)
-                || e is EventOfEndCallArgs)
+            if ((Subscribers.ContainsKey(e.TargetNumber) && e.TargetNumber != e.Number) || e is EventOfEndCallArgs)
             {
                 CallInfo callInfo = null;
                 Port targetPort;
@@ -74,8 +73,8 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 }
                 if (targetPort.State == States.StateOfPort.Connect && port.State == StateOfPort.Connect)
                 {
-                    var tuple = Subscribers[number];
-                    var targetTuple = Subscribers[targetNumber];
+                    var portContract = Subscribers[number];
+                    var targetPortContract = Subscribers[targetNumber];
 
                     if (e is EventOfAnswerArgs)
                     {
@@ -93,12 +92,12 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                         }
                         else
                         {
-                            targetPort.AnswerCall(answerArgs.Number, answerArgs.TargetNumber, answerArgs.StateOfCall);
+                            targetPort.AnswerCall(answerArgs.Number, answerArgs.TargetNumber, answerArgs.StateOfCall, callInfo.Id);
                         }
                     }
                     if (e is EventOfCallArgs)
                     {
-                        if (tuple.Item2.Subscriber.Account > tuple.Item2.Tariff.PricePerMinute)
+                        if (portContract.Item2.Subscriber.Account > portContract.Item2.Tariff.PricePerMinute)
                         {
                             var callArgs = (EventOfCallArgs)e;
 
@@ -121,7 +120,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                             }
                             else
                             {
-                                targetPort.IncomingCall(callArgs.Number, callArgs.TargetNumber);
+                                targetPort.IncomingCall(callArgs.Number, callArgs.TargetNumber, callInfo.Id);
                             }
                         }
                         else
@@ -135,9 +134,9 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                         var args = (EventOfEndCallArgs)e;
                         callInfo = Calls.First(x => x.Id.Equals(args.Id));
                         callInfo.EndOfCall = DateTime.Now;
-                        var sumOfCall = tuple.Item2.Tariff.PricePerMinute * TimeSpan.FromTicks((callInfo.EndOfCall - callInfo.StartOfCall).Ticks).TotalMinutes;
+                        var sumOfCall = portContract.Item2.Tariff.PricePerMinute * TimeSpan.FromTicks((callInfo.EndOfCall - callInfo.StartOfCall).Ticks).TotalMinutes;
                         callInfo.CostOfCall = (int)sumOfCall;
-                        targetTuple.Item2.Subscriber.WithdrawMoney(callInfo.CostOfCall);
+                        targetPortContract.Item2.Subscriber.WithdrawMoney(callInfo.CostOfCall);
                         targetPort.AnswerCall(args.Number, args.TargetNumber, StateOfCall.Reject, callInfo.Id);
                     }
                 }
