@@ -58,7 +58,7 @@
     <Compile Include="EventsArgs\EventOfCallArgs.cs" />
     <Compile Include="BillingSystem\Contract.cs" />
     <Compile Include="EventsArgs\EventOfEndCallArgs.cs" />
-    <Compile Include="EventsArgs\IEventArgs.cs" />
+    <Compile Include="EventsArgs\ICallEventArgs.cs" />
     <Compile Include="States\TypeOfCall.cs" />
     <Compile Include="States\TypeOfSort.cs" />
     <Compile Include="States\TypeOfTariff.cs" />

@@ -10,15 +10,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 {
     public class Terminal
     {
-        private int _number;
-        public int Number
-        {
-            get
-            {
-                return _number;
-            }
-        }
-
+        public int Number { get; private set; }
         private Port TerminalPort { get; set; }
         private Guid Id { get; set; }
         public event EventHandler<EventOfCallArgs> EventOfCall;
@@ -26,7 +18,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         public event EventHandler<EventOfEndCallArgs> EventOfEndCall;
         public Terminal(int number, Port port)
         {
-            _number = number;
+            Number = number;
             TerminalPort = port;
         }
         public void ConnectToATS()
@@ -46,10 +38,11 @@ namespace ATS_Task3.AutomaticTelephoneSystem
             }
         }
 
+
         protected virtual void SafeEventOfCall(int targetNumber)
         {
             if (EventOfCall != null)
-                EventOfCall(this, new EventOfCallArgs(_number, targetNumber));
+                EventOfCall(this, new EventOfCallArgs(Number, targetNumber));
         }
         public void Call(int targetNumber)
         {
@@ -57,23 +50,23 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         }
 
 
-        protected virtual void SafeEventOfAnswer(int targetNumber, StateOfCall stateOfCall, Guid id)
+        protected virtual void SafeEventOfAnswer(int targetNumber, StateOfCall state, Guid id)
         {
             if (EventOfAnswer != null)
             {
-                EventOfAnswer(this, new EventOfAnswerArgs(Number, targetNumber, stateOfCall, id));
+                EventOfAnswer(this, new EventOfAnswerArgs(Number, targetNumber, state, id));
             }
         }
-        public void Answer(int targetNumber, StateOfCall stateOfCall, Guid id)
+        public void Answer(int target, StateOfCall state, Guid id)
         {
-            SafeEventOfAnswer(targetNumber, stateOfCall, id);
+            SafeEventOfAnswer(target, state, id);
         }
 
 
         protected virtual void SafeEventOfEndCall(Guid id)
         {
             if (EventOfEndCall != null)
-                EventOfEndCall(this, new EventOfEndCallArgs(id, _number));
+                EventOfEndCall(this, new EventOfEndCallArgs(id, Number));
         }
         public void EndCall()
         {
@@ -81,10 +74,8 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         }
 
 
-        //TestMethods
         public void TakeIncomingCall(object sender, EventOfCallArgs e)
         {
-            
             bool flag = true;
             Id = e.Id;
             Console.WriteLine("Have incoming Call at number: {0} to terminal {1}", e.Number, e.TargetNumber);
@@ -111,23 +102,21 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 }
             }
         }
+        public void TakeAnswer(object sender, EventOfAnswerArgs e)
+        {
+            Id = e.Id;
+            if (e.StateOfCall == StateOfCall.Answer)
+            {
+                Console.WriteLine("Terminal with number: {0}, have answer on call a number: {1}", e.Number, e.TargetNumber);
+            }
+            else
+            {
+                Console.WriteLine("Terminal with number: {0}, have rejected call", e.Number);
+            }
+        }
         public void AnswerToCall(int target, StateOfCall state, Guid id)
         {
             SafeEventOfAnswer(target, state, id);
         }
-        public void TakeAnswer(object sender, EventOfAnswerArgs e)
-        {
-            Id = e.Id;
-            Console.WriteLine("He answered!!!");
-            if (e.StateOfCall == StateOfCall.Answer)
-            {
-                Console.WriteLine("Terminal {0} have answered on call from terminal {1}", e.TargetNumber, e.Number);
-            }
-            else
-            {
-                Console.WriteLine("Terminal {0} have rejected call from terminal {1}", e.TargetNumber, e.Number);
-            }
-        }
-
     }
 }

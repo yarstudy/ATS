@@ -11,12 +11,13 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 {
     public class ATS : IATS
     {
-        private IList<CallInfo> _calls = new List<CallInfo>();
+        private IList<CallInfo> Calls { get; set; }
         private IDictionary<int, Tuple<Port, IContract>> Subscribers { get; set; }
 
         public ATS()
         {
-        Subscribers = new Dictionary<int, Tuple<Port, IContract>>();
+            Calls = new List<CallInfo>();
+            Subscribers = new Dictionary<int, Tuple<Port, IContract>>();
         }
 
         public Terminal NewTerminal(IContract contract)
@@ -38,7 +39,8 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 
         public void Calling(object sender, ICallEventArgs e)
         {
-            if ((Subscribers.ContainsKey(e.TargetNumber) && e.TargetNumber != e.Number) || e is EventOfEndCallArgs)
+            if ((Subscribers.ContainsKey(e.TargetNumber) && e.TargetNumber != e.Number)
+                || e is EventOfEndCallArgs)
             {
                 CallInfo callInfo = null;
                 Port targetPort;
@@ -47,7 +49,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 int targetNumber = 0;
                 if (e is EventOfEndCallArgs)
                 {
-                    var callListFirst = _calls.First(x => x.Id.Equals(e.Id));
+                    var callListFirst = Calls.First(x => x.Id.Equals(e.Id));
                     if (callListFirst.Number == e.Number)
                     {
                         targetPort = Subscribers[callListFirst.TargetNumber].Item1;
@@ -80,9 +82,9 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 
                         var answerArgs = (EventOfAnswerArgs)e;
 
-                        if (!answerArgs.Id.Equals(Guid.Empty) && _calls.Any(x => x.Id.Equals(answerArgs.Id)))
+                        if (!answerArgs.Id.Equals(Guid.Empty) && Calls.Any(x => x.Id.Equals(answerArgs.Id)))
                         {
-                            callInfo = _calls.First(x => x.Id.Equals(answerArgs.Id));
+                            callInfo = Calls.First(x => x.Id.Equals(answerArgs.Id));
                         }
 
                         if (callInfo != null)
@@ -106,12 +108,12 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                                     callArgs.Number,
                                     callArgs.TargetNumber,
                                     DateTime.Now);
-                                _calls.Add(callInfo);
+                                Calls.Add(callInfo);
                             }
 
-                            if (!callArgs.Id.Equals(Guid.Empty) && _calls.Any(x => x.Id.Equals(callArgs.Id)))
+                            if (!callArgs.Id.Equals(Guid.Empty) && Calls.Any(x => x.Id.Equals(callArgs.Id)))
                             {
-                                callInfo = _calls.First(x => x.Id.Equals(callArgs.Id));
+                                callInfo = Calls.First(x => x.Id.Equals(callArgs.Id));
                             }
                             if (callInfo != null)
                             {
@@ -131,7 +133,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                     if (e is EventOfEndCallArgs)
                     {
                         var args = (EventOfEndCallArgs)e;
-                        callInfo = _calls.First(x => x.Id.Equals(args.Id));
+                        callInfo = Calls.First(x => x.Id.Equals(args.Id));
                         callInfo.EndOfCall = DateTime.Now;
                         var sumOfCall = tuple.Item2.Tariff.PricePerMinute * TimeSpan.FromTicks((callInfo.EndOfCall - callInfo.StartOfCall).Ticks).TotalMinutes;
                         callInfo.CostOfCall = (int)sumOfCall;
@@ -139,7 +141,6 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                         targetPort.AnswerCall(args.Number, args.TargetNumber, StateOfCall.Reject, callInfo.Id);
                     }
                 }
-
             }
             else if (!Subscribers.ContainsKey(e.TargetNumber))
             {
@@ -152,7 +153,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         }
         public IList<CallInfo> GetInformationList()
         {
-            return _calls;
+            return Calls;
         }
     }
 }
