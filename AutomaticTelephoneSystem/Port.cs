@@ -42,7 +42,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 State = StateOfPort.Connect;
                 terminal.EventOfCall += CallingTo;
                 terminal.EventOfAnswer += AnswerTo;
-                terminal.EventOfEndCall += EndCall;
+                //terminal.EventOfEndCall += EndCall;
                 stateOfPort = true;
             }
             return stateOfPort;
@@ -90,7 +90,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         private void SafeAnswerCallEvent(int number, int target, StateOfCall state, Guid id)
         {
             if (PortAnswerEvent != null)
-                PortAnswerEvent(this, new EventOfAnswerArgs(number, target, state));
+                PortAnswerEvent(this, new EventOfAnswerArgs(number, target, state, id));
         }
         public void AnswerCall(int number, int target, StateOfCall state)
         {

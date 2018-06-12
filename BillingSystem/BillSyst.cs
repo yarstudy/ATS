@@ -11,16 +11,16 @@ namespace ATS_Task3.BillingSystem
 {
     public class BillSyst : IBillSyst
     {
-        private IMemory<CallInfo> Memory { get; set; }
+        private IMemory<CallInfo> _memory;
         public BillSyst(IMemory<CallInfo> memory)
         {
-            Memory = memory;
+            _memory = memory;
         }
         public Report GetReport(int telephoneNumber)
         {
-            var calls = Memory.GetInformationList().
+            var calls = _memory.GetInformationList().
                 Where(x => x.Number == telephoneNumber || x.TargetNumber == telephoneNumber).ToList();
-            Report report = new Report();
+            var report = new Report();
             foreach (var call in calls)
             {
                 TypeOfCall callType;

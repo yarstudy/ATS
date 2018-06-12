@@ -11,12 +11,11 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 {
     public class ATS : IATS
     {
-        private IList<CallInfo> Calls { get; set; }
+        private IList<CallInfo> _calls = new List<CallInfo>();
         private IDictionary<int, Tuple<Port, IContract>> Subscribers { get; set; }
 
         public ATS()
         {
-        Calls = new List<CallInfo>();
         Subscribers = new Dictionary<int, Tuple<Port, IContract>>();
         }
 
@@ -48,8 +47,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                 int targetNumber = 0;
                 if (e is EventOfEndCallArgs)
                 {
-                    var callListFirst = Calls.First(x => x.Id.Equals(e.Id));
-                    
+                    var callListFirst = _calls.First(x => x.Id.Equals(e.Id));
                     if (callListFirst.Number == e.Number)
                     {
                         targetPort = Subscribers[callListFirst.TargetNumber].Item1;
@@ -82,9 +80,9 @@ namespace ATS_Task3.AutomaticTelephoneSystem
 
                         var answerArgs = (EventOfAnswerArgs)e;
 
-                        if (!answerArgs.Id.Equals(Guid.Empty) && Calls.Any(x => x.Id.Equals(answerArgs.Id)))
+                        if (!answerArgs.Id.Equals(Guid.Empty) && _calls.Any(x => x.Id.Equals(answerArgs.Id)))
                         {
-                            callInfo = Calls.First(x => x.Id.Equals(answerArgs.Id));
+                            callInfo = _calls.First(x => x.Id.Equals(answerArgs.Id));
                         }
 
                         if (callInfo != null)
@@ -108,12 +106,12 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                                     callArgs.Number,
                                     callArgs.TargetNumber,
                                     DateTime.Now);
-                                Calls.Add(callInfo);
+                                _calls.Add(callInfo);
                             }
 
-                            if (!callArgs.Id.Equals(Guid.Empty) && Calls.Any(x => x.Id.Equals(callArgs.Id)))
+                            if (!callArgs.Id.Equals(Guid.Empty) && _calls.Any(x => x.Id.Equals(callArgs.Id)))
                             {
-                                callInfo = Calls.First(x => x.Id.Equals(callArgs.Id));
+                                callInfo = _calls.First(x => x.Id.Equals(callArgs.Id));
                             }
                             if (callInfo != null)
                             {
@@ -133,7 +131,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
                     if (e is EventOfEndCallArgs)
                     {
                         var args = (EventOfEndCallArgs)e;
-                        callInfo = Calls.First(x => x.Id.Equals(args.Id));
+                        callInfo = _calls.First(x => x.Id.Equals(args.Id));
                         callInfo.EndOfCall = DateTime.Now;
                         var sumOfCall = tuple.Item2.Tariff.PricePerMinute * TimeSpan.FromTicks((callInfo.EndOfCall - callInfo.StartOfCall).Ticks).TotalMinutes;
                         callInfo.CostOfCall = (int)sumOfCall;
@@ -154,7 +152,7 @@ namespace ATS_Task3.AutomaticTelephoneSystem
         }
         public IList<CallInfo> GetInformationList()
         {
-            return Calls;
+            return _calls;
         }
     }
 }
